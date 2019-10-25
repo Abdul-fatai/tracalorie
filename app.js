@@ -12,9 +12,9 @@ const ItemCtrl = (function(){
     //Data Structure / State
     const data = {
         items: [
-            {id: 0, name: "Steak Dinner", calories: 1200},
-            {id: 1, name: "Cookie", calories: 300},
-            {id: 2, name: "Eggs", calories: 400}
+            // {id: 0, name: "Steak Dinner", calories: 1200},
+            // {id: 1, name: "Cookie", calories: 300},
+            // {id: 2, name: "Eggs", calories: 400}
         ],
         currentItem: null,
         totalCalories: 0
@@ -87,6 +87,30 @@ const UICtrl = (function(){
             }
         },
 
+        addListItem: function(item){
+            // Show the list
+            document.querySelector(UIselectors.item).style.display = 'block';
+            const li = document.createElement('li');
+            li.className = 'collection-item';
+            li.id = `item-${item.id}`;
+            li.innerHTML = `
+                <strong>${item.name}: </strong> <em>${item.calories} Calories</em>
+                <a href="#" class="secondary-content">
+                    <i class="edit-item fa fa-pencil"></i>
+                </a>
+            `;
+
+            //Insert item
+            document.querySelector(UIselectors.item).insertAdjacentElement('beforeend', li);
+        },
+        clearInput: function () {
+            document.querySelector(UIselectors.itemNameInput).value = '';
+            document.querySelector(UIselectors.itemCaloriesInput).value = '';
+        },
+
+        hideList: function () {
+            document.querySelector(UIselectors.item).style.display = 'none';
+        },
         getUISelectors: function(){
             return UIselectors;
         }
@@ -112,7 +136,13 @@ const App = (function(ItemCtrl, UICtrl){
         //Check for name and calories input
         if (input.name !== '' && input.calories !== '') {
             // Add Item
-            const addNewItem = ItemCtrl.addItem(input.name, input.calories);
+            const newItem = ItemCtrl.addItem(input.name, input.calories);
+
+            //Add item to UI list
+            UICtrl.addListItem(newItem);
+
+            //Clear fields
+            UICtrl.clearInput();
         }
     }
     //Public methods
@@ -121,9 +151,13 @@ const App = (function(ItemCtrl, UICtrl){
             //Fetch items from data structure 
             const items = ItemCtrl.getData();
 
-            //Populate list with items
-            UICtrl.populateItemList(items);
+            if (items.length === 0) {
+                UICtrl.hideList();
+            } else {
+                //Populate list with items
+                UICtrl.populateItemList(items);
 
+            }
             //Load event listeners
             loadEventListeners();
         }
